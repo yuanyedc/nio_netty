@@ -24,11 +24,13 @@
         <processorPath useClasspath="true" />
         <module name="nettyExam" />
         <module name="nettySingle" />
+        <module name="nio_netty" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="nettyExam" target="1.7" />
+      <module name="nettyExam" target="1.8" />
       <module name="nettySingle" target="1.7" />
+      <module name="nio_netty" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
