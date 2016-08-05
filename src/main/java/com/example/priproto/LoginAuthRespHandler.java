@@ -19,6 +19,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         NettyMessage message = (NettyMessage) msg;
+        log.info("接收请求数据:" + message);
         if (message != null && message.getHeader().getType() == MessageType.HAND_REQ.value) {
             String nodeIndex = ctx.channel().remoteAddress().toString();
             NettyMessage loginResp = null;
@@ -39,7 +40,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
                     nodeCheck.put(nodeIndex, true);
                 }
             }
-            log.info("握手请求：" + loginResp + " body:" + loginResp.getBody());
+            log.info("握手响应：" + loginResp + " body:" + loginResp.getBody());
             ctx.writeAndFlush(loginResp);
         } else {
             ctx.fireChannelRead(msg);

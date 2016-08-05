@@ -10,14 +10,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(buildLoginReq());
+        NettyMessage message = buildLoginReq();
+        log.info("请求数据:" + message);
+        ctx.writeAndFlush(message);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         NettyMessage message = (NettyMessage) msg;
+        log.info("接收响应：" + message);
         if (message != null && message.getHeader().getType() == MessageType.HAND_RES.value) {
             byte loginResult = (byte) message.getBody();
             if (loginResult != 0) {

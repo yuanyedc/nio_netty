@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * Created by yuanye on 2016/7/28.
  */
+@Slf4j
 public final class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
     NettyMarshallingEncoder marshallingEncoder;
 
@@ -51,8 +53,9 @@ public final class NettyMessageEncoder extends MessageToMessageEncoder<NettyMess
         value = null;
         if (nettyMessage.getBody() != null) {
             marshallingEncoder.encode(channelHandlerContext, nettyMessage.getBody(), sendBuf);
+        } else {
+            sendBuf.writeInt(0);
         }
-        sendBuf.writeInt(0);
         sendBuf.setInt(4, sendBuf.readableBytes());
         list.add(sendBuf);
     }

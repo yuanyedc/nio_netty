@@ -1,10 +1,12 @@
 package com.example.priproto;
 
 import com.example.serial.MarshallingCodeCFactory;
+import com.example.serial.MarshallingDecoder;
 import com.example.serial.NettyMarshallingDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Map;
 /**
  * Created by yuanye on 2016/7/29.
  */
+@Slf4j
 public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
     NettyMarshallingDecoder marshallingDecoder;
 
@@ -23,6 +26,7 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         ByteBuf frame = (ByteBuf) super.decode(ctx, in);
+        log.info("=========frame:" + frame);
         if (frame == null) {
             return null;
         }
