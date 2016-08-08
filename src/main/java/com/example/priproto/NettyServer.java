@@ -21,23 +21,28 @@ public class NettyServer {
     public void bind() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, 100)
-                .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new NettyMessageDecoder(1024, 4, 4));
-                        socketChannel.pipeline().addLast(new NettyMessageEncoder());
-                        socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
-                        socketChannel.pipeline().addLast(new LoginAuthRespHandler());
-                        socketChannel.pipeline().addLast("HeartBeatHandler", new HeartBeatRespHandler());
-                    }
-                });
-        serverBootstrap.bind(NettyConstant.REMOTEIP, NettyConstant.PORT).sync();
-        log.info("Netty server start ok : " + (NettyConstant.REMOTEIP + " : " + NettyConstant.PORT));
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 100)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4, -8, 0));
+                            socketChannel.pipeline().addLast(new NettyMessageEncoder());
+                            socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+                            socketChannel.pipeline().addLast(new LoginAuthRespHandler());
+                            socketChannel.pipeline().addLast("HeartBeatHandler", new HeartBeatRespHandler());
+                        }
+                    });
+            ChannelFuture channelFuture = serverBootstrap.bind(NettyConstant.REMOTEIP, NettyConstant.PORT).sync();
+            log.info("Netty server start ok : " + (NettyConstant.REMOTEIP + " : " + NettyConstant.PORT));
+            channelFuture.channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
     }
 
     public static void main(String[] args) {

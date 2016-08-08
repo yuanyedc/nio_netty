@@ -39,7 +39,7 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new NettyMessageDecoder(1024, 4, 4));
+                            socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4, -8, 0));
                             socketChannel.pipeline().addLast("MessageEncoder", new NettyMessageEncoder());
                             socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
                             socketChannel.pipeline().addLast("LoginAuthHandler", new LoginAuthReqHandler());
@@ -60,7 +60,7 @@ public class NettyClient {
                 @Override
                 public void run() {
                     try {
-                        TimeUnit.SECONDS.sleep(1);
+                        TimeUnit.SECONDS.sleep(5);
                         try {
                             connect(NettyConstant.REMOTEIP, NettyConstant.PORT);// 发起重连操作
                         } catch (Exception e) {

@@ -20,14 +20,17 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         NettyMessage message = (NettyMessage) msg;
         log.info("接收请求数据:" + message);
+        log.info("message type:"+message.getHeader().getType());
         if (message != null && message.getHeader().getType() == MessageType.HAND_REQ.value) {
             String nodeIndex = ctx.channel().remoteAddress().toString();
+            log.info("=========nodeIndex:"+nodeIndex);
             NettyMessage loginResp = null;
             if (nodeCheck.containsKey(nodeIndex)) {
                 loginResp = buildResponse((byte) -1);
             } else {
                 InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 String ip = address.getAddress().getHostAddress();
+                log.info("=====ip:"+ip);
                 boolean isOk = false;
                 for (String WIP : whiteList) {
                     if (WIP.equals(ip)) {
@@ -40,7 +43,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
                     nodeCheck.put(nodeIndex, true);
                 }
             }
-            log.info("握手响应：" + loginResp + " body:" + loginResp.getBody());
+            log.info("握手响应：" + loginResp);
             ctx.writeAndFlush(loginResp);
         } else {
             ctx.fireChannelRead(msg);
